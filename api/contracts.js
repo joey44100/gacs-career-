@@ -1,0 +1,6 @@
+const FLEET=new Set(['A388','A359','A35K','A339','A343','B772','B77W','B78X','A20N','A21N','B738','B739','CRJ9','C25C']);
+export default async function handler(req,res){
+ const origin=String(req.query.origin||'').toUpperCase();if(!/^[A-Z0-9]{4}$/.test(origin))return res.status(400).json({error:'Origin ICAO invalide'});
+ const base=process.env.GACS_SCHEDULE_API_URL,token=process.env.GACS_SCHEDULE_API_TOKEN;if(!base)return res.status(503).json({error:'Fournisseur de schedules futurs non configuré',message:'GACS refuse de générer des contrats fictifs. Configure GACS_SCHEDULE_API_URL côté Vercel.'});
+ try{const u=new URL(base);u.searchParams.set('origin',origin);u.searchParams.set('from',new Date(Date.now()+150*60000).toISOString());u.searchParams.set('hours','24');const r=await fetch(u,{headers:token?{Authorization:`Bearer ${token}`}:{}});if(!r.ok)throw new Error('Schedule provider HTTP '+r.status);const data=await r.json();const rows=Array.isArray(data)?data:(data.flights||[]);const cutoff=Date.now()+150*60000;const contracts=rows.filter(f=>Date.parse(f.stdUtc||f.scheduledDeparture)>=cutoff&&FLEET.has(String(f.aircraftIcao||f.type||'').toUpperCase())).map(f=>({...f,dataStatus:'LIVE'}));res.json({origin,cutoff:new Date(cutoff).toISOString(),contracts});}catch(e){res.status(502).json({error:e.message});}
+}
