@@ -1,13 +1,17 @@
-# GACS Career v0.6 LIVE
+# GACS Career v0.7 LIVE
 
-PWA + Vercel serverless gateway.
+PWA de carrière MSFS / OCC.
 
-## Live integrations
-- AviationWeather.gov METAR/TAF: ready, no key.
-- SimBrief latest OFP: ready via Pilot ID/Alias.
-- Flightradar24: server adapter ready; requires `FR24_API_TOKEN`.
-- Future schedules: provider adapter ready; requires `GACS_SCHEDULE_API_URL` (+ optional token). GACS intentionally returns no contracts when absent.
-- Navigraph: UI/status prepared; requires developer OAuth credentials before implementation can be activated.
-- SayIntentions/MSFS: requires PC bridge for local files/SimConnect.
+## Ce qui fonctionne sans clé payante
+- PWA HTTPS / mobile
+- carrière locale persistante
+- METAR/TAF
+- récupération du dernier OFP SimBrief par Pilot ID
+- test local SayIntentions `http://localhost:43117/flightJSON` depuis le PC
 
-Secrets belong in Vercel Environment Variables, never in index.html.
+## Contract Board LIVE
+La v0.7 supporte **AirLabs Schedules** directement. Crée une clé AirLabs (leur documentation indique un accès Free), colle-la dans `LIVE Integrations`, puis clique `Enregistrer + tester`. La clé reste dans le stockage local du navigateur et est transmise uniquement à la fonction Vercel via HTTPS pour la requête AirLabs. Elle n'est pas commitée dans GitHub.
+
+Le board applique ensuite : origine actuelle, départ >= 2h30, statut non annulé, et type ICAO appartenant exactement à la flotte GACS.
+
+FR24 est optionnel pour validation/tracking et nécessite son propre abonnement API. Navigraph nécessite des credentials développeur accordés par Navigraph. MSFS nécessite le bridge Windows SimConnect.
